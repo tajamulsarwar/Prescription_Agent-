@@ -1,0 +1,13 @@
+{
+  "trunk": {
+    "name": "InboundTrunk-Phone-+XXXXXXXXXX",
+    "numbers": [
+      "XXXXXXXXXX"
+    ],
+    "auth_username": "XXXXXX",
+    "auth_password": "REPLACE_WITH_YOUR_SIP_AUTH_PASSWORD",
+    "allowedAddresses": [
+      "XXXX"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "dispatch_rule": {
+    "rule": {
+      "dispatchRuleIndividual": {
+        "roomPrefix": "appointment_prescription_agent"
+      }
+    },
+    "name": "appointment_prescription_agent",
+    "trunk_ids": ["ST_your_trunk_id"],
+    "roomConfig": {
+      "emptyTimeout": 300,
+      "maxParticipants": 20,
+      "agents": [
+        {
+          "agentName": "appointment_prescription_agent",
+          "metadata": "{\"practice_code\":\"\",\"source\":\"dispatch_rule.json\",\"inbound_number\":\"XXXXXXXXXXX\"}"
+        }
+      ]
+    }
+  }
+}
+ 

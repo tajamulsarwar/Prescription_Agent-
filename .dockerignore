@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Transcripts (runtime generated)
+transcripts/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

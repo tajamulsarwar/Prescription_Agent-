@@ -1,0 +1,15 @@
+livekit
+livekit-agents
+livekit-plugins-openai
+livekit-plugins-noise-cancellation
+livekit-plugins-elevenlabs
+livekit-api
+openai
+python-dotenv
+mysql-connector-python
+pyodbc
+flask
+flask-cors
+mcp
+anyio
+requests

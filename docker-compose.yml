@@ -1,0 +1,102 @@
+services:
+  # Prescription Refill Agent Service
+  prescription_agent:
+    build: .
+    image: prescription-agent
+    container_name: prescription-agent-app
+    restart: unless-stopped
+    ports:
+      - "9034:5001"  # Flask server port
+      - "9035:8080"  # LiveKit agent port
+    env_file:
+      - .env
+    environment:
+      # LiveKit Configuration
+      - LIVEKIT_URL=${LIVEKIT_URL}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+      - LIVEKIT_SIP_PORT=${LIVEKIT_SIP_PORT:-5060}
+      - LIVEKIT_SIP_DOMAIN=${LIVEKIT_SIP_DOMAIN:-}
+      - LIVEKIT_LOG_LEVEL=${LIVEKIT_LOG_LEVEL:-INFO}
+      - LIVEKIT_LOG_FORMAT=${LIVEKIT_LOG_FORMAT:-json}
+      
+      # Database Configuration
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      
+      # SQL Server (fallback) Configuration
+      - DB_SERVER=${DB_SERVER}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      
+      # OpenAI Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      
+      # ElevenLabs TTS Configuration
+      - ELEVEN_API_KEY=${ELEVEN_API_KEY}
+      
+      # EHR/PMS and MCP Server Configuration
+      - EHR_APP_API_KEY=${EHR_APP_API_KEY}
+      - N8N_MCP_SERVER_URL=${N8N_MCP_SERVER_URL}
+      
+      # Business Entity Configuration (practice specific)
+      - BUSINESS_ID=${BUSINESS_ID}
+      - USER_PROFILE_ID=${USER_PROFILE_ID}
+      
+      # Agent Configuration
+      - AGENT_NAME=${AGENT_NAME:-Prescription-Agent}
+      
+      # Development Configuration
+      - DEBUG=${DEBUG:-false}
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - FLASK_DEBUG=${FLASK_DEBUG:-false}
+      
+      # Audio Configuration for Better Voice Quality and Reduced Dropouts
+      - AUDIO_SAMPLE_RATE=${AUDIO_SAMPLE_RATE:-24000}
+      - TELEPHONY_SAMPLE_RATE=${TELEPHONY_SAMPLE_RATE:-16000}
+      - AUDIO_ENCODING=${AUDIO_ENCODING:-pcm16}
+      - AUDIO_CHANNELS=${AUDIO_CHANNELS:-1}
+      - AUDIO_FRAME_SIZE=${AUDIO_FRAME_SIZE:-480}
+      - AUDIO_BUFFER_SIZE=${AUDIO_BUFFER_SIZE:-960}
+      - AUDIO_JITTER_BUFFER=${AUDIO_JITTER_BUFFER:-300}
+      - AUDIO_PACKET_SIZE=${AUDIO_PACKET_SIZE:-20}
+      - LIVEKIT_AUDIO_REDUNDANCY=${LIVEKIT_AUDIO_REDUNDANCY:-true}
+      - LIVEKIT_AUDIO_DTX=${LIVEKIT_AUDIO_DTX:-false}
+      - LIVEKIT_AUDIO_FEC=${LIVEKIT_AUDIO_FEC:-true}
+    volumes:
+      - ${PWD:-.}:/app
+    networks:
+      - prescription-agent-network
+    command: sh -c "python server.py & python agent.py start"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    init: true
+    security_opt:
+      - seccomp:unconfined
+    shm_size: 128m
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:5001/getToken?name=healthcheck&room=test', timeout=5)\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  prescription-agent-network:
+    driver: bridge
